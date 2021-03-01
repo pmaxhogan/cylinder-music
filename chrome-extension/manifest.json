@@ -1,0 +1,32 @@
+{
+  "name": "Apple Music Token Retriever",
+  "description" : "Grabs the Apple Music auth token and user token",
+  "version": "1.0",
+  "manifest_version": 2,
+  "permissions": [
+    "https://music.apple.com/*",
+    "https://beta.music.apple.com/*",
+    "storage"
+  ],
+  "icons": {
+    "128": "icon.png"
+  },
+  "externally_connectable": {
+    "matches": ["https://cylinder-music.web.app/*"]
+  },
+  "content_scripts": [
+    {
+      "js": ["appleScript.js"],
+      "matches": [
+        "https://music.apple.com/*",
+        "https://beta.music.apple.com/*"
+      ],
+      "run_at": "document_end"
+    }
+  ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "key": "hhnekigbnngailmnpmmmimgnophiolle"
+}

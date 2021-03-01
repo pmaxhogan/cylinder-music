@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+
+    <script>history.scrollRestoration = "manual"</script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src https://fonts.googleapis.com 'unsafe-inline' 'self'; font-src https://fonts.gstatic.com ; script-src https://cdn.jsdelivr.net/npm/vue/dist/vue.js https://unpkg.com/html2canvas@1.0.0-rc.7/dist/html2canvas.js 'unsafe-eval' 'self'; img-src data: https://*.mzstatic.com 'self'; connect-src https://cylinder-music.herokuapp.com">
+    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; style-src https://fonts.googleapis.com 'unsafe-inline' 'self'; font-src https://fonts.gstatic.com; script-src https://cdn.jsdelivr.net/npm/vue/dist/vue.js https://unpkg.com/html2canvas@1.0.0-rc.7/dist/html2canvas.js 'unsafe-eval' 'self'; img-src data: https://*.mzstatic.com 'self'; connect-src https://cylinder-music.herokuapp.com">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+
+    <title>Cylinder Music</title>
+
+    <style>
+      html,body{
+        margin: 0;
+        padding: 0;
+      }
+
+      main:focus, .simple-btn:focus{
+        outline: none;
+      }
+
+      body{
+        font-family: 'Roboto', sans-serif;
+        background: #b5edff;
+      }
+
+      .simple-btn {
+        padding: 1px 6px;
+        border: none;
+        background: #80ff00;
+        box-shadow: 0 0 3px 1px #0000008f;
+        border-radius: 3px;
+        font-size: inherit;
+        margin: 3px;
+        cursor: pointer;
+      }
+
+      .simple-btn:hover{
+        box-shadow: none;
+      }
+
+      .simple-btn[disabled] {
+        box-shadow: none;
+      }
+
+      .simple-btn.inset{
+        box-shadow: inset 0 0 3px 1px #0000008f;
+      }
+
+      #album-header{
+        position: sticky;
+        top: 0; /* yes this is required */
+        background: #b5edff;
+        margin-bottom: 2px;
+        box-shadow: 0px 1px 5px 1px black;
+        padding: 5px;
+
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      .spacer{
+        flex-grow: 1;
+      }
+
+      #album-holder{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      #delete{
+        color: red;
+      }
+
+      ::-webkit-scrollbar{
+        display: none;
+      }
+
+      [v-cloak] {
+        display: none;
+      }
+
+      #data-input{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        flex-direction: column;
+      }
+
+      #manual-container{
+        width: max(50%, 800px);
+        max-width: 100%;
+      }
+
+      code {
+        word-break: break-all;
+        background-color: black;
+        color: white;
+        user-select: all;
+      }
+
+    /* https://loading.io */
+      .lds-roller {
+        display: inline-block;
+        position: absolute;
+        width: 80px;
+        height: 80px;
+      }
+      .lds-roller div {
+        animation: lds-roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+        transform-origin: 40px 40px;
+      }
+      .lds-roller div:after {
+        content: " ";
+        display: block;
+        position: absolute;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #000;
+        margin: -4px 0 0 -4px;
+      }
+      .lds-roller div:nth-child(1) {
+        animation-delay: -0.036s;
+      }
+      .lds-roller div:nth-child(1):after {
+        top: 63px;
+        left: 63px;
+      }
+      .lds-roller div:nth-child(2) {
+        animation-delay: -0.072s;
+      }
+      .lds-roller div:nth-child(2):after {
+        top: 68px;
+        left: 56px;
+      }
+      .lds-roller div:nth-child(3) {
+        animation-delay: -0.108s;
+      }
+      .lds-roller div:nth-child(3):after {
+        top: 71px;
+        left: 48px;
+      }
+      .lds-roller div:nth-child(4) {
+        animation-delay: -0.144s;
+      }
+      .lds-roller div:nth-child(4):after {
+        top: 72px;
+        left: 40px;
+      }
+      .lds-roller div:nth-child(5) {
+        animation-delay: -0.18s;
+      }
+      .lds-roller div:nth-child(5):after {
+        top: 71px;
+        left: 32px;
+      }
+      .lds-roller div:nth-child(6) {
+        animation-delay: -0.216s;
+      }
+      .lds-roller div:nth-child(6):after {
+        top: 68px;
+        left: 24px;
+      }
+      .lds-roller div:nth-child(7) {
+        animation-delay: -0.252s;
+      }
+      .lds-roller div:nth-child(7):after {
+        top: 63px;
+        left: 17px;
+      }
+      .lds-roller div:nth-child(8) {
+        animation-delay: -0.288s;
+      }
+      .lds-roller div:nth-child(8):after {
+        top: 56px;
+        left: 12px;
+      }
+      @keyframes lds-roller {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main v-cloak tabindex="-1" @keyup.arrow-left="imgSize -= 5" @keyup.arrow-right="imgSize += 5" @keyup.arrow-down.prevent="bkgSize -= 10" @keyup.arrow-up.prevent="bkgSize += 10" @keyup.d="speed ++" @keyup.s="speed --">
+      <div v-if="albums.length">
+        <div id="album-header" v-if="showHeader">
+          <span>
+            <simple-btn @click="resetPos">Reset Cover Position</simple-btn>
+          </span>
+          <span>
+            Sort by:
+            <simple-btn @click="sortByName">Name</simple-btn><simple-btn @click="sortByGenre">Genre</simple-btn><simple-btn @click="sortByReleaseDate">Release Date</simple-btn><simple-btn @click="sortByTrackCount">Track Count</simple-btn>
+          </span>
+          <span>
+            <simple-btn @click="reverseOrder">Reverse Order</simple-btn><simple-btn @click="randomOrder">Randomize</simple-btn>
+          </span>
+          <span>
+            Tile size:
+            <simple-btn @click="imgSize += 5">+</simple-btn><simple-btn @click="imgSize -= 5">-</simple-btn><simple-btn @click="imgSizeFit">Fit</simple-btn>
+          </span>
+          <span>
+            Art size:
+            <simple-btn @click="bkgSize += 10">+</simple-btn><simple-btn @click="bkgSize -= 10">-</simple-btn>
+          </span>
+          <span>
+            Animation:
+            <template v-if="enableAnimation"><simple-btn @click="speed --">+</simple-btn><simple-btn @click="speed ++">-</simple-btn><simple-btn @click="enableAnimation = false">Disable</simple-btn></template>
+            <simple-btn v-else @click="enableAnimation = true">Enable</simple-btn>
+          </span>
+
+          <span class="spacer"></span>
+
+          <simple-btn v-if="showDelete === false" @click="showDelete = true">🗑️</simple-btn>
+          <simple-btn v-else id="delete" @click="deleteData">Delete all data</simple-btn>
+
+          <simple-btn id="hide-header" @click="showHeader = false">-</simple-btn>
+        </div>
+        <simple-btn v-else @click="showHeader = true">+</simple-btn>
+
+        <div id="album-holder">
+          <div class="album" v-for="album in albums" :style="cardStyles(album)" :key="album.url"></div>
+        </div>
+      </div>
+      <div id="data-input" v-else>
+        <h2>You have not been authenticated.</h2>
+        <div v-if="noExtensionData">
+          It seems the Chrome extension is installed, but we didn't get any sign-in data. Are you signed in to Apple Music? Try <a href="https://music.apple.com/us/browse">opening Apple Music</a> again
+        </div>
+        <div v-else-if="isChrome">
+          <simple-btn :disabled="loading" @click="installExtension">Install Chrome extension</simple-btn>
+        </div>
+        <div v-else>
+          It seems you are using a browser other than Chrome. You can still enter the data manually.
+        </div>
+
+        <simple-btn :disabled="loading" @click="manual = !manual">Enter Data Manually</simple-btn>
+        <div v-show="manual" id="manual-container">
+          <simple-btn :disabled="loading" style="display: block" @click="showManualInstructions = !showManualInstructions">Manual Data Instructions</simple-btn>
+          <div v-if="showManualInstructions">
+          <ol>
+            <li>Go to <a href="https://music.apple.com/us/browse">Apple Music</a> on a desktop or laptop</li>
+            <li>Open DevTools (Right click, "Inspect Element" or Control + Shift + I or F12))</li>
+            <li>Go to the Console panel</li>
+            <li>Paste in the following code <code>copy("Bearer " + JSON.parse(decodeURIComponent(document.querySelector(`meta[name="desktop-music-app/config/environment"]`).getAttribute("content"))).MEDIA_API.token)</code> and press enter</li>
+            <li>The "auth" token will be copied to your clipboard. Paste it in the first input below</li>
+            <li>Go back to the Apple Music tab and paste the following code into the Console panel <code>copy(document.cookie.split("; ").find(row => row.startsWith("media-user-token")).replace("media-user-token=", ""))</code> and press enter</li>
+            <li>The user token will be copied to your clipboard. Paste it in the second input below</li>
+            <li>Click "Get Album Data"</li>
+          </ol>
+        </div>
+
+          <label>Auth: <input :disabled="loading" v-model="auth" placeholder="begins with Bearer"/></label>
+          <label>Token: <input :disabled="loading" v-model="token" placeholder="media-user-token"/></label>
+          <simple-btn :disabled="loading" @click="getImageUrls()">Get Album Data</simple-btn>
+        </div>
+
+        <div class="lds-roller" v-if="loading"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+    </main>
+
+    <script type="text/x-template" id="simple-btn-template">
+      <button class="simple-btn" @click="click" :class="{inset: isInset}"><slot></slot></button>
+    </script>
+
+    <script src="main.js"></script>
+  </body>
+</html>
